@@ -47,12 +47,6 @@ class PermissionAspectTest {
     @RestController
     static class DemoPermController {
 
-        @RequirePerm("user:create")
-        @GetMapping("/api/users")
-        public Map<String, String> users() {
-            return Map.of("ok", "true");
-        }
-
         @RequirePerm("audit:pass")
         @PostMapping("/api/order-audits/{id}/pass")
         public Map<String, String> auditPass(@PathVariable Long id) {
