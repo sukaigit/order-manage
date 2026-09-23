@@ -144,6 +144,44 @@ CREATE TABLE IF NOT EXISTS tb_order_audit (
   update_time DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ---------------- 操作日志（扩展表） ----------------
+-- 在 architecture.md 13 表基线之上新增，支撑 logs spec 持久化
+-- 列对齐 OperationLog.vue：操作人/操作类型/操作目标/IP/时间（时间->create_time）
+CREATE TABLE IF NOT EXISTS tb_operation_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user VARCHAR(64) NOT NULL, -- 操作人
+  action VARCHAR(64) NOT NULL, -- 操作类型
+  target VARCHAR(128), -- 操作目标
+  ip VARCHAR(64), -- IP
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP, -- 时间
+  update_time DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ---------------- 索引（列表/筛选查询） ----------------
+CREATE INDEX IF NOT EXISTS idx_user_status ON tb_user(status);
+CREATE INDEX IF NOT EXISTS idx_user_department_id ON tb_user(department_id);
+CREATE INDEX IF NOT EXISTS idx_user_organization_id ON tb_user(organization_id);
+CREATE INDEX IF NOT EXISTS idx_user_role_user_id ON tb_user_role(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_role_role_id ON tb_user_role(role_id);
+CREATE INDEX IF NOT EXISTS idx_organization_parent_id ON tb_organization(parent_id);
+CREATE INDEX IF NOT EXISTS idx_organization_level ON tb_organization(level);
+CREATE INDEX IF NOT EXISTS idx_menu_parent_id ON tb_menu(parent_id);
+CREATE INDEX IF NOT EXISTS idx_menu_menu_type ON tb_menu(menu_type);
+CREATE INDEX IF NOT EXISTS idx_menu_function_menu_id ON tb_menu_function(menu_id);
+CREATE INDEX IF NOT EXISTS idx_menu_function_function_id ON tb_menu_function(function_id);
+CREATE INDEX IF NOT EXISTS idx_role_menu_role_id ON tb_role_menu(role_id);
+CREATE INDEX IF NOT EXISTS idx_role_menu_menu_id ON tb_role_menu(menu_id);
+CREATE INDEX IF NOT EXISTS idx_role_function_role_id ON tb_role_function(role_id);
+CREATE INDEX IF NOT EXISTS idx_role_function_function_id ON tb_role_function(function_id);
+CREATE INDEX IF NOT EXISTS idx_supplier_status ON tb_supplier(status);
+CREATE INDEX IF NOT EXISTS idx_order_status ON tb_order(status);
+CREATE INDEX IF NOT EXISTS idx_order_supplier_id ON tb_order(supplier_id);
+CREATE INDEX IF NOT EXISTS idx_order_create_time ON tb_order(create_time);
+CREATE INDEX IF NOT EXISTS idx_order_audit_order_id ON tb_order_audit(order_id);
+CREATE INDEX IF NOT EXISTS idx_operation_log_user ON tb_operation_log(user);
+CREATE INDEX IF NOT EXISTS idx_operation_log_action ON tb_operation_log(action);
+CREATE INDEX IF NOT EXISTS idx_operation_log_create_time ON tb_operation_log(create_time);
+
 -- ============================================================
 -- 初始化数据
 -- ============================================================
@@ -356,3 +394,11 @@ INSERT INTO tb_supplier (id, code, name, contact, phone, address, status, create
 (1, 'SUP-001', '华东原料供应商', '张三', '13800000001', '上海市浦东新区', '启用', '2026-01-01 00:00:00', '2026-01-01 00:00:00'),
 (2, 'SUP-002', '南方包装供应商', '李四', '13800000002', '广州市天河区', '启用', '2026-01-01 00:00:00', '2026-01-01 00:00:00'),
 (3, 'SUP-003', '北方物流供应商', '王五', '13800000003', '北京市朝阳区', '停用', '2026-01-01 00:00:00', '2026-01-01 00:00:00');
+
+-- 操作日志（5 行样例）：对齐 OperationLog.vue 原型列，供日志页初始展示
+INSERT INTO tb_operation_log (id, user, action, target, ip, create_time, update_time) VALUES
+(1, 'admin', '登录', '系统', '192.168.1.10', '2026-09-01 09:00:00', '2026-09-01 09:00:00'),
+(2, 'admin', '新增订单', 'ORD20260905', '192.168.1.20', '2026-09-01 09:15:00', '2026-09-01 09:15:00'),
+(3, '审核员', '审核通过', 'ORD20260905', '192.168.1.30', '2026-09-02 09:15:00', '2026-09-02 09:15:00'),
+(4, 'admin', '导出报表', '订单明细报表', '192.168.1.40', '2026-09-03 10:15:00', '2026-09-03 10:15:00'),
+(5, 'admin', '修改密码', '用户admin', '192.168.1.50', '2026-09-04 10:20:00', '2026-09-04 10:20:00');
