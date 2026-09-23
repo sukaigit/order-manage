@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS tb_user (
   status VARCHAR(8) NOT NULL DEFAULT '启用', -- 启用 / 停用
   department_id INTEGER,
   organization_id INTEGER,
+  first_login INTEGER NOT NULL DEFAULT 0, -- 1=首次登录需强制改密（REQ-AUTH-007）
+  fail_count INTEGER NOT NULL DEFAULT 0, -- 连续密码错误次数，>=5 锁定（REQ-AUTH-003）
   remark VARCHAR(255),
   create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -130,6 +132,7 @@ CREATE TABLE IF NOT EXISTS tb_order (
   amount REAL NOT NULL CHECK (amount >= 0), -- 金额非负
   supplier_id INTEGER,
   status VARCHAR(8) NOT NULL DEFAULT '待审核', -- 待审核 / 已驳回 / 已完成
+  remark VARCHAR(255),
   create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -211,8 +214,8 @@ INSERT INTO tb_organization (id, code, name, short_name, level, parent_id, conta
 
 -- 用户（1 行）：默认管理员 admin
 -- password: 123456 （MD5: e10adc3949ba59abbe56e057f20f883e，仅存哈希）
-INSERT INTO tb_user (id, username, password, real_name, status, department_id, organization_id, remark, create_time, update_time) VALUES
-(1, 'admin', 'e10adc3949ba59abbe56e057f20f883e', '管理员', '启用', 1, 1, '默认管理员', '2026-01-01 00:00:00', '2026-01-01 00:00:00');
+INSERT INTO tb_user (id, username, password, real_name, status, department_id, organization_id, first_login, fail_count, remark, create_time, update_time) VALUES
+(1, 'admin', 'e10adc3949ba59abbe56e057f20f883e', '管理员', '启用', 1, 1, 0, 0, '默认管理员', '2026-01-01 00:00:00', '2026-01-01 00:00:00');
 
 -- 用户-角色关联（1 行）：admin -> 管理员
 INSERT INTO tb_user_role (id, user_id, role_id, create_time, update_time) VALUES
