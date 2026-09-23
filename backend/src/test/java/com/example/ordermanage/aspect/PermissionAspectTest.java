@@ -48,7 +48,7 @@ class PermissionAspectTest {
     static class DemoPermController {
 
         @RequirePerm("audit:pass")
-        @PostMapping("/api/order-audits/{id}/pass")
+        @PostMapping("/api/perm-demo/audit-pass/{id}")
         public Map<String, String> auditPass(@PathVariable Long id) {
             return Map.of("ok", "true");
         }
@@ -117,7 +117,7 @@ class PermissionAspectTest {
     @Test
     void roleUserAuditPassReturns403() throws Exception {
         String token = login("user01");
-        mockMvc.perform(post("/api/order-audits/1/pass")
+        mockMvc.perform(post("/api/perm-demo/audit-pass/1")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden());
     }
@@ -125,7 +125,7 @@ class PermissionAspectTest {
     @Test
     void adminAuditPassReturns403() throws Exception {
         String token = login("admin");
-        mockMvc.perform(post("/api/order-audits/1/pass")
+        mockMvc.perform(post("/api/perm-demo/audit-pass/1")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden());
     }
@@ -133,7 +133,7 @@ class PermissionAspectTest {
     @Test
     void auditorAuditPassReturns200() throws Exception {
         String token = login("auditor01");
-        mockMvc.perform(post("/api/order-audits/1/pass")
+        mockMvc.perform(post("/api/perm-demo/audit-pass/1")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
     }
