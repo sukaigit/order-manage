@@ -3,6 +3,7 @@ package com.example.ordermanage.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.ordermanage.annotation.OpLog;
 import com.example.ordermanage.common.BizException;
 import com.example.ordermanage.common.Err;
 import com.example.ordermanage.common.PageParam;
@@ -95,6 +96,7 @@ public class FunctionService {
                 .collect(Collectors.toMap(Menu::getId, Menu::getName));
     }
 
+    @OpLog(action = "新增功能", targetSpEL = "#root.result.code")
     public FunctionListItem create(FunctionSaveRequest req) {
         validate(req);
         String perm = req.getPerm().trim();
@@ -113,6 +115,7 @@ public class FunctionService {
         return toItem(function, loadMenuNames(List.of(function)));
     }
 
+    @OpLog(action = "编辑功能", targetSpEL = "#root.args[1].perm")
     public FunctionListItem update(Long id, FunctionSaveRequest req) {
         Function function = require(id);
         validate(req);
@@ -131,6 +134,7 @@ public class FunctionService {
     }
 
     @Transactional
+    @OpLog(action = "删除功能", targetSpEL = "#root.args[0]")
     public void delete(Long id) {
         Function function = require(id);
         menuFunctionMapper.delete(new QueryWrapper<MenuFunction>().eq("function_id", id));

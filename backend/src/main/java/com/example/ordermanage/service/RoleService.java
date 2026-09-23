@@ -3,6 +3,7 @@ package com.example.ordermanage.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.ordermanage.annotation.OpLog;
 import com.example.ordermanage.common.BizException;
 import com.example.ordermanage.common.Err;
 import com.example.ordermanage.common.PageParam;
@@ -59,6 +60,7 @@ public class RoleService {
         return new PageResult<>(page.getTotal(), items);
     }
 
+    @OpLog(action = "新增角色", targetSpEL = "#root.result.code")
     public RoleListItem create(RoleSaveRequest req) {
         if (!StringUtils.hasText(req.getName())) {
             throw new BizException(Err.BAD_REQUEST, "请输入角色名称");
@@ -82,6 +84,7 @@ public class RoleService {
         return toItem(role);
     }
 
+    @OpLog(action = "编辑角色", targetSpEL = "#root.args[1].code")
     public RoleListItem update(Long id, RoleSaveRequest req) {
         Role role = require(id);
         if (!StringUtils.hasText(req.getName())) {
@@ -94,6 +97,7 @@ public class RoleService {
         return toItem(role);
     }
 
+    @OpLog(action = "删除角色", targetSpEL = "#root.args[0]")
     public void delete(Long id) {
         Role role = require(id);
         Long refs = userRoleMapper.selectCount(new QueryWrapper<UserRole>().eq("role_id", id));

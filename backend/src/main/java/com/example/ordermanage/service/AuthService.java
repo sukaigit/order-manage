@@ -2,6 +2,7 @@ package com.example.ordermanage.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.example.ordermanage.annotation.OpLog;
 import com.example.ordermanage.common.BizException;
 import com.example.ordermanage.common.Err;
 import com.example.ordermanage.common.PasswordValidator;
@@ -33,6 +34,7 @@ public class AuthService {
         this.permissionQueryService = permissionQueryService;
     }
 
+    @OpLog(action = "登录", targetSpEL = "#root.args[0].username")
     public LoginResponse login(LoginRequest req) {
         String username = req.getUsername() == null ? "" : req.getUsername().trim();
         String password = req.getPassword() == null ? "" : req.getPassword();
@@ -98,10 +100,12 @@ public class AuthService {
         return buildLoginResponse(user, token);
     }
 
+    @OpLog(action = "退出", targetSpEL = "#root.args[0]")
     public void logout(String token) {
         tokenService.remove(token);
     }
 
+    @OpLog(action = "修改密码")
     public void changePassword(Long userId, String oldPassword, String newPassword, String confirmPassword) {
         if (!org.springframework.util.StringUtils.hasText(oldPassword)) {
             throw new BizException(Err.BAD_REQUEST, "请输入当前密码");
@@ -125,6 +129,7 @@ public class AuthService {
         updatePassword(user, newPassword);
     }
 
+    @OpLog(action = "修改密码")
     public void forceChangePassword(Long userId, String newPassword, String confirmPassword, String currentToken) {
         validateNewPassword(newPassword, confirmPassword);
         User user = userMapper.selectById(userId);

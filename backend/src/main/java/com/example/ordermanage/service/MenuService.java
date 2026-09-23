@@ -3,6 +3,7 @@ package com.example.ordermanage.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.ordermanage.annotation.OpLog;
 import com.example.ordermanage.common.BizException;
 import com.example.ordermanage.common.Err;
 import com.example.ordermanage.common.PageParam;
@@ -197,6 +198,7 @@ public class MenuService {
         return node;
     }
 
+    @OpLog(action = "新增菜单", targetSpEL = "#root.result.code")
     public MenuTreeNode create(MenuSaveRequest req) {
         if (!StringUtils.hasText(req.getName())) {
             throw new BizException(Err.BAD_REQUEST, "请输入菜单名称");
@@ -238,6 +240,7 @@ public class MenuService {
         return toNode(menu);
     }
 
+    @OpLog(action = "编辑菜单", targetSpEL = "#root.args[1].code")
     public MenuTreeNode update(Long id, MenuSaveRequest req) {
         Menu menu = require(id);
         if (!StringUtils.hasText(req.getName())) {
@@ -258,6 +261,7 @@ public class MenuService {
     }
 
     @Transactional
+    @OpLog(action = "删除菜单", targetSpEL = "#root.args[0]")
     public void delete(Long id) {
         Menu menu = require(id);
         Long children = menuMapper.selectCount(new QueryWrapper<Menu>().eq("parent_id", id));

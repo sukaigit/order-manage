@@ -67,6 +67,11 @@ public class ReportService {
         return orderService.page(null, supplierId, null, startDate, endDate, p);
     }
 
+    public List<OrderListItem> exportRows(String startDate, String endDate, Long supplierId) {
+        requireAdmin();
+        return orderService.listAll(null, supplierId, null, startDate, endDate);
+    }
+
     private List<StatusDistItem> statusDist(String startDate, String endDate, Long supplierId,
                                             long total) {
         Map<String, Long> counts = orderMapper.selectMaps(

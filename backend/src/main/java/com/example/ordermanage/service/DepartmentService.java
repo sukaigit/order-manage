@@ -3,6 +3,7 @@ package com.example.ordermanage.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.ordermanage.annotation.OpLog;
 import com.example.ordermanage.common.BizException;
 import com.example.ordermanage.common.Err;
 import com.example.ordermanage.common.PageParam;
@@ -43,6 +44,7 @@ public class DepartmentService {
         return new PageResult<>(page.getTotal(), items);
     }
 
+    @OpLog(action = "新增部门", targetSpEL = "#root.result.code")
     public DepartmentListItem create(DepartmentSaveRequest req) {
         validate(req);
         String code = req.getCode().trim();
@@ -59,6 +61,7 @@ public class DepartmentService {
         return toItem(dept);
     }
 
+    @OpLog(action = "编辑部门", targetSpEL = "#root.args[1].code")
     public DepartmentListItem update(Long id, DepartmentSaveRequest req) {
         Department dept = require(id);
         validate(req);
@@ -75,6 +78,7 @@ public class DepartmentService {
         return toItem(dept);
     }
 
+    @OpLog(action = "删除部门", targetSpEL = "#root.args[0]")
     public void delete(Long id) {
         Department dept = require(id);
         Long refs = userMapper.selectCount(new QueryWrapper<User>().eq("department_id", id));

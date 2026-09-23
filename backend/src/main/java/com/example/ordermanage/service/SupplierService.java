@@ -3,6 +3,7 @@ package com.example.ordermanage.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.ordermanage.annotation.OpLog;
 import com.example.ordermanage.common.BizException;
 import com.example.ordermanage.common.Err;
 import com.example.ordermanage.common.PageParam;
@@ -34,6 +35,16 @@ public class SupplierService {
 
     public PageResult<Supplier> page(String keyword, String status, PageParam p) {
         p.validate();
+        IPage<Supplier> page = supplierMapper.selectPage(
+                new Page<>(p.getPage(), p.getPageSize()), queryWrapper(keyword, status));
+        return new PageResult<>(page.getTotal(), page.getRecords());
+    }
+
+    public List<Supplier> listAll(String keyword, String status) {
+        return supplierMapper.selectList(queryWrapper(keyword, status));
+    }
+
+    private QueryWrapper<Supplier> queryWrapper(String keyword, String status) {
         QueryWrapper<Supplier> wrapper = new QueryWrapper<>();
         if (StringUtils.hasText(keyword)) {
             String like = keyword.trim();
@@ -43,10 +54,10 @@ public class SupplierService {
             wrapper.eq("status", status.trim());
         }
         wrapper.orderByAsc("id");
-        IPage<Supplier> page = supplierMapper.selectPage(new Page<>(p.getPage(), p.getPageSize()), wrapper);
-        return new PageResult<>(page.getTotal(), page.getRecords());
+        return wrapper;
     }
 
+    @OpLog(action = "新增供应商", targetSpEL = "#root.result.code")
     public Supplier create(SupplierSaveRequest req) {
         validate(req);
         String code = req.getCode().trim();
@@ -66,6 +77,7 @@ public class SupplierService {
         return supplier;
     }
 
+    @OpLog(action = "编辑供应商", targetSpEL = "#root.args[1].code")
     public Supplier update(Long id, SupplierSaveRequest req) {
         Supplier supplier = require(id);
         validate(req);
@@ -84,6 +96,7 @@ public class SupplierService {
         return supplier;
     }
 
+    @OpLog(action = "删除供应商", targetSpEL = "#root.args[0]")
     public void delete(Long id) {
         Supplier supplier = require(id);
         Long refs = orderMapper.selectCount(new QueryWrapper<Order>().eq("supplier_id", id));

@@ -3,6 +3,7 @@ package com.example.ordermanage.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.ordermanage.annotation.OpLog;
 import com.example.ordermanage.common.BizException;
 import com.example.ordermanage.common.Err;
 import com.example.ordermanage.common.PageParam;
@@ -96,12 +97,14 @@ public class OrderAuditService {
         return new OrderAuditPageResult(page.getTotal(), items, pendingCount);
     }
 
+    @OpLog(action = "审核通过", targetSpEL = "#root.result.orderId")
     public OrderAuditActionResponse pass(Long id, OrderAuditOpinionRequest req) {
         Order order = requirePending(id);
         String opinion = req == null || req.getOpinion() == null ? "" : req.getOpinion();
         return doAudit(order, RESULT_PASS, opinion, OrderService.STATUS_FINISHED);
     }
 
+    @OpLog(action = "审核驳回", targetSpEL = "#root.result.orderId")
     public OrderAuditActionResponse reject(Long id, OrderAuditOpinionRequest req) {
         Order order = requirePending(id);
         String opinion = req == null ? null : req.getOpinion();

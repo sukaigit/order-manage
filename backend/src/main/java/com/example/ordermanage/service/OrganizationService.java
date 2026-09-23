@@ -1,6 +1,7 @@
 package com.example.ordermanage.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.ordermanage.annotation.OpLog;
 import com.example.ordermanage.common.BizException;
 import com.example.ordermanage.common.Err;
 import com.example.ordermanage.common.PageParam;
@@ -145,6 +146,7 @@ public class OrganizationService {
         return node;
     }
 
+    @OpLog(action = "新增机构", targetSpEL = "#root.result.code")
     public OrgTreeNode create(OrganizationSaveRequest req) {
         if (!StringUtils.hasText(req.getCode())) {
             throw new BizException(Err.BAD_REQUEST, "请输入机构编号");
@@ -198,6 +200,7 @@ public class OrganizationService {
         return toNode(org);
     }
 
+    @OpLog(action = "编辑机构", targetSpEL = "#root.args[1].code")
     public OrgTreeNode update(Long id, OrganizationSaveRequest req) {
         Organization org = require(id);
         if (!StringUtils.hasText(req.getName())) {
@@ -224,6 +227,7 @@ public class OrganizationService {
         return toNode(org);
     }
 
+    @OpLog(action = "删除机构", targetSpEL = "#root.args[0]")
     public void delete(Long id) {
         Organization org = require(id);
         Long children = organizationMapper.selectCount(

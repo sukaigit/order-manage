@@ -3,6 +3,7 @@ package com.example.ordermanage.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.ordermanage.annotation.OpLog;
 import com.example.ordermanage.common.BizException;
 import com.example.ordermanage.common.Err;
 import com.example.ordermanage.common.PageParam;
@@ -43,6 +44,19 @@ public class OrderService {
     public PageResult<OrderListItem> page(String keyword, Long supplierId, String status,
                                           String startDate, String endDate, PageParam p) {
         p.validate();
+        QueryWrapper<Order> wrapper = queryWrapper(keyword, supplierId, status, startDate, endDate);
+        IPage<Order> page = orderMapper.selectPage(new Page<>(p.getPage(), p.getPageSize()), wrapper);
+        return new PageResult<>(page.getTotal(), toListItems(page.getRecords()));
+    }
+
+    public List<OrderListItem> listAll(String keyword, Long supplierId, String status,
+                                       String startDate, String endDate) {
+        return toListItems(orderMapper.selectList(
+                queryWrapper(keyword, supplierId, status, startDate, endDate)));
+    }
+
+    private QueryWrapper<Order> queryWrapper(String keyword, Long supplierId, String status,
+                                             String startDate, String endDate) {
         QueryWrapper<Order> wrapper = new QueryWrapper<>();
         if (StringUtils.hasText(keyword)) {
             String like = keyword.trim();
@@ -61,10 +75,10 @@ public class OrderService {
             wrapper.le("create_time", parseDate(endDate, true));
         }
         wrapper.orderByAsc("id");
-        IPage<Order> page = orderMapper.selectPage(new Page<>(p.getPage(), p.getPageSize()), wrapper);
-        return new PageResult<>(page.getTotal(), toListItems(page.getRecords()));
+        return wrapper;
     }
 
+    @OpLog(action = "新增订单", targetSpEL = "#root.result.orderNo")
     public OrderListItem create(OrderSaveRequest req) {
         validate(req);
         if (orderMapper.selectCount(new QueryWrapper<Order>().eq("order_no", req.getOrderNo().trim())) > 0) {
@@ -84,6 +98,7 @@ public class OrderService {
         return toListItem(order);
     }
 
+    @OpLog(action = "编辑订单", targetSpEL = "#root.result.orderNo")
     public OrderListItem update(Long id, OrderSaveRequest req) {
         Order order = require(id);
         if (STATUS_FINISHED.equals(order.getStatus())) {
@@ -103,6 +118,7 @@ public class OrderService {
         return toListItem(order);
     }
 
+    @OpLog(action = "删除订单", targetSpEL = "#root.args[0]")
     public void delete(Long id) {
         Order order = require(id);
         if (STATUS_FINISHED.equals(order.getStatus())) {

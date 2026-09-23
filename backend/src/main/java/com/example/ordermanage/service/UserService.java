@@ -3,6 +3,7 @@ package com.example.ordermanage.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.ordermanage.annotation.OpLog;
 import com.example.ordermanage.common.BizException;
 import com.example.ordermanage.common.Err;
 import com.example.ordermanage.common.PageParam;
@@ -119,6 +120,7 @@ public class UserService {
         return user;
     }
 
+    @OpLog(action = "新增用户", targetSpEL = "#root.result.username")
     public UserListItem create(UserSaveRequest req) {
         validate(req);
         if (userMapper.selectCount(new QueryWrapper<User>().eq("username", req.getUsername().trim())) > 0) {
@@ -146,6 +148,7 @@ public class UserService {
         return toItem(user);
     }
 
+    @OpLog(action = "编辑用户", targetSpEL = "#root.args[1].username")
     public UserListItem update(Long id, UserSaveRequest req) {
         User user = require(id);
         validate(req);
@@ -249,6 +252,7 @@ public class UserService {
         return resp;
     }
 
+    @OpLog(action = "删除用户", targetSpEL = "#root.args[0]")
     public void delete(Long id) {
         User user = require(id);
         if ("admin".equals(user.getUsername())) {
