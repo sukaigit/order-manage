@@ -37,6 +37,11 @@ public final class Err {
 
     public static final String USERNAME_EXISTS = "用户名已存在";
     public static final String CODE_EXISTS = "编号已存在";
+    public static final String DEPT_CODE_EXISTS = "部门编号已存在";
+    public static final String ORG_CODE_EXISTS = "机构编号已存在";
+    public static final String MENU_CODE_EXISTS = "菜单编号已存在";
+    public static final String PERM_EXISTS = "权限标识已存在";
+    public static final String PERM_FORMAT_INVALID = "权限标识格式必须为域:操作";
 
     private Err() {
     }
