@@ -24,6 +24,10 @@ public class User {
     private Long departmentId;
     @TableField("organization_id")
     private Long organizationId;
+    @TableField("first_login")
+    private Integer firstLogin;
+    @TableField("fail_count")
+    private Integer failCount;
     private String remark;
     @TableField("create_time")
     private LocalDateTime createTime;

@@ -23,6 +23,7 @@ public class Order {
     @TableField("supplier_id")
     private Long supplierId;
     private String status;
+    private String remark;
     @TableField("create_time")
     private LocalDateTime createTime;
     @TableField("update_time")
