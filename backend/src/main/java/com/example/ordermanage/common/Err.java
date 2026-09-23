@@ -41,6 +41,7 @@ public final class Err {
     public static final String ORG_CODE_EXISTS = "机构编号已存在";
     public static final String MENU_CODE_EXISTS = "菜单编号已存在";
     public static final String SUPPLIER_CODE_EXISTS = "供应商编号已存在";
+    public static final String ORDER_NO_EXISTS = "订单编号已存在";
     public static final String PERM_EXISTS = "权限标识已存在";
     public static final String PERM_FORMAT_INVALID = "权限标识格式必须为域:操作";
 
