@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:sqlite:${ORDER_DB:../data/order-manage.db}
+    driver-class-name: org.sqlite.JDBC
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+server:
+  port: 8080
